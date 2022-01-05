@@ -9,6 +9,7 @@
   "author": "arnab",
   "license": "ISC",
   "dependencies": {
-    "dcp-client": "^4.1.16"
+    "dcp-client": "^4.1.16",
+    "dcp-worker": "^3.1.13"
   }
 }
