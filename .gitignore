@@ -1,3 +1,19 @@
+#srcfiles
+frames/
+frame.jpg
+frame1.jpg
+frame2.jpg
+frame3.jpg
+frame4.jpg
+output.txt
+testframe.png
+testframe1.png
+testframe2.png
+testvid.mp4
+testvid1.mp4
+testvid2.mp4
+
+
 # Logs
 logs
 *.log
