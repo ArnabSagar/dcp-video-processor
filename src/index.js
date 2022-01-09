@@ -38,58 +38,57 @@
 
 
 
-const sharp = require("sharp");
-const readlineSync = require("readline-sync");
-const fs = require("fs");
+// const sharp = require("sharp");
+// const readlineSync = require("readline-sync");
+// const fs = require("fs");
 
 
-
-const loadFileFromPath = async () => {
-  var filePath = readlineSync.question("What's the file path :");
-  try {
-    const file = await sharp(filePath);
-    return file;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-
-const convertToGrayscale = async (path) => {
-  const img = await path; 
-  const bw = await img.gamma().greyscale();
-  return bw;
- };
+// const loadFileFromPath = async () => {
+//   var filePath = readlineSync.question("What's the file path :");
+//   try {
+//     const file = await sharp(filePath);
+//     return file;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 
- const resizeImg = async (bw, newWidth = 100) => {
-  const blackAndWhite = await bw;
-  const size = await blackAndWhite.metadata();
-  const ratio = size.width / size.height;
-  newHeight = parseInt(newWidth * ratio);
-  const resized = await blackAndWhite.resize(newWidth, newHeight, {
-    fit: "outside",
-  });
-
-  return resized;
-};
+// const convertToGrayscale = async (path) => {
+//   const img = await path; 
+//   const bw = await img.gamma().greyscale();
+//   return bw;
+//  };
 
 
-const pixelToAscii = async (img) => {
-  var newImg = await img;
-  const pixels = await newImg.raw().toBuffer();
-  characters = "";
-  pixels.forEach((pixel) => {
-    characters = characters + ASCII_CHARS[Math.floor(pixel * interval)];
-  });
-  return characters;
-};
+//  const resizeImg = async (bw, newWidth = 100) => {
+//   const blackAndWhite = await bw;
+//   const size = await blackAndWhite.metadata();
+//   const ratio = size.width / size.height;
+//   newHeight = parseInt(newWidth * ratio);
+//   const resized = await blackAndWhite.resize(newWidth, newHeight, {
+//     fit: "outside",
+//   });
 
-ASCII_CHARS = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ".split("");
+//   return resized;
+// };
 
-charLength = ASCII_CHARS.length;
-interval = charLength / 256;
-var newHeight = null;
+
+// const pixelToAscii = async (img) => {
+//   var newImg = await img;
+//   const pixels = await newImg.raw().toBuffer();
+//   characters = "";
+//   pixels.forEach((pixel) => {
+//     characters = characters + ASCII_CHARS[Math.floor(pixel * interval)];
+//   });
+//   return characters;
+// };
+
+// ASCII_CHARS = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ".split("");
+
+// charLength = ASCII_CHARS.length;
+// interval = charLength / 256;
+// var newHeight = null;
 
 // const main = async (newWidth = 100) => {
 //   const newImgData = await pixelToAscii(
@@ -112,25 +111,57 @@ var newHeight = null;
 
 
 
-
 const ffmpeg = require('ffmpeg');
 
+// const Image = require('ascii-art-image');
 
-const main = () => {    
+// function preview (){
+
+    // for(var i = 1; i<1000; i++){
+
+    //     var image = new Image({
+    //         filepath: `./frames/my_frame_1920x810_${i}.jpg`,
+    //         alphabet:'variant1'
+    //     });
+    
+    //     image.write(function(err, rendered){
+    //         console.log(rendered);
+    
+    //     })
+    
+
+    // }
+        
+
+    // var image = new Image({
+    //     filepath: `./frames/my_frame_1920x810_317.jpg`,
+    //     alphabet:'variant1'
+    // });
+
+    // image.write(function(err, rendered){
+    //     console.log(rendered);
+
+    // })
+
+// }
+
+
+function createFrames(pathToVideo){
 
     try {
-        var process = new ffmpeg('testvid.mp4');
+        var process = new ffmpeg(pathToVideo);
         process.then(function (video) {
-            // Callback mode
+    
             video.fnExtractFrameToJPG('./frames', {
                 every_n_frames : 2,
-                file_name : 'my_frame_%t_%s'
+                file_name : 'my_frame_%s'
             }, function (error, files) {
                 if (!error){
-                    console.log('Frames: ' + files);
+                    console.log('Frames saved');
+            
                 }
                 else{
-                    console.log(error);
+                    console.log('Error! Frames not saved.\n' + error);
                 }
             });
         }, function (err) {
@@ -141,30 +172,86 @@ const main = () => {
         console.log(e.msg);
     }
 
+}
 
+//Possibly work function
+function convertFrame(image){ 
+    
+    // var image = new Image({
+    //     filepath: `./frames/my_frame_1920x810_317.jpg`,
+    //     alphabet:'variant1'
+    // });
 
+    // image.write(function(err, rendered){
+    //     console.log(rendered);
 
-    //Per FRAME ASCII ::  
-
-  const Image = require('ascii-art-image');
-
-
-    for(var i = 0; i<1000; i++){
-        
-    }
-
-  var image = new Image({
-      filepath: './frames/my_frame_1641511707878_1920x810_317.jpg',
-      alphabet:'variant4'
-  });
-
-  image.write(function(err, rendered){
-      console.log(rendered);
-
-  })
-
+    // })
 
 }
 
+function createVideo(pathToImages){
+
+    // const { Converter } = require("ffmpeg-stream")
+    // const { createReadStream, createWriteStream } = require("fs")
+
+    // async function convert() {
+    //     const converter = new Converter()
+
+    //     // get a writable input stream and pipe an image file to it
+    //     const converterInput = converter.createInputStream({
+    //         f: "image2pipe",
+    //         vcodec: "mjpeg",
+    //     })
+    //     createReadStream(`${__dirname}/cat.jpg`).pipe(converterInput)
+
+    //     // create an output stream, crop/scale image, save to file via node stream
+
+    //     const converterOutput = converter.createOutputStream({
+    //         f: "image2",
+    //         vcodec: "mjpeg",
+    //         vf: "crop=300:300,scale=100:100",
+    //     })
+    //     converterOutput.pipe(createWriteStream(`${__dirname}/cat_thumb.jpg`))
+
+    //     // same, but save tconvert base64 image to pixel art
+    //     // start processing
+
+    //     await converter.run()
+    // }
+}
+
+
+async function workFunc(image) {
+
+    let DEFAULT_OPT = {
+        blurMode: {
+            name: "bilateral",
+            radius: 5
+        },
+        edgeWeakening: 50,
+        resize: false
+    }
+    
+    let Cartoonlization = require("photo2cartoon");
+    
+    let c = new Cartoonlization(DEFAULT_OPT);
+
+    c.init(`frame.jpg`).then((cs)=>{
+        let c = cs[0];
+        c.make();
+        c.toFile(`./result/test500.jpg`);
+    });
+
+}
+
+const main = () => {    
+ 
+    // createFrames('testvid1.mp4');
+    // createVideo();
+
+    // ffmpeg -i my_frame_854x360_%d.jpg -vcodec mpeg4 test.avi
+
+
+}
 
 main();

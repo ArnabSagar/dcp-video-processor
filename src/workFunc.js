@@ -1,8 +1,0 @@
-async function workFunc(image) {
-
-
-
-
-
-
-}

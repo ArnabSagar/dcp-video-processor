@@ -14,6 +14,7 @@
     "dcp-worker": "^3.1.13",
     "ffmpeg": "0.0.4",
     "ffmpeg-extract-frames": "^2.0.2",
+    "ffmpeg-stream": "^0.7.0",
     "readline-sync": "^1.4.10",
     "sharp": "^0.29.3"
   }
