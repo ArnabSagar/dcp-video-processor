@@ -15,7 +15,12 @@
     "ffmpeg": "0.0.4",
     "ffmpeg-extract-frames": "^2.0.2",
     "ffmpeg-stream": "^0.7.0",
+    "get-pixels": "^3.3.3",
+    "image-pixels": "^2.2.2",
+    "jimp": "^0.16.1",
     "readline-sync": "^1.4.10",
-    "sharp": "^0.29.3"
+    "save-pixels": "^2.3.6",
+    "sharp": "^0.29.3",
+    "zeros": "^1.0.0"
   }
 }

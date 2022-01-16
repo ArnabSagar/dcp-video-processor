@@ -1,94 +1,14 @@
 const SCHEDULER_URL = new URL('https://scheduler.distributed.computer');
 const sharp = require("sharp");
-const readlineSync = require("readline-sync");
+
 const fs = require("fs");
-
-// const mandelbrot = require("./mandelbrot-set.js");
-// const create_image = require("./image-animation.js");
-
-
-
-const loadFileFromPath = async () => {
-  var filePath = readlineSync.question("What's the file path :");
-  try {
-    const file = await sharp(filePath);
-    // console.log(file);
-    return file;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-
-// const convertToGrayscale = async (path) => {
-//   const img = await path; 
-//   const bw = await img.gamma().greyscale();
-//   return bw;
-//  };
-
-
-//  const resizeImg = async (bw, newWidth = 100) => {
-//   const blackAndWhite = await bw;
-//   const size = await blackAndWhite.metadata();
-//   const ratio = size.width / size.height;
-//   newHeight = parseInt(newWidth * ratio);
-//   const resized = await blackAndWhite.resize(newWidth, newHeight, {
-//     fit: "outside",
-//   });
-
-//   return resized;
-// };
-
-
-// const pixelToAscii = async (img) => {
-//   var newImg = await img;
-//   const pixels = await newImg.raw().toBuffer();
-//   characters = "";
-//   pixels.forEach((pixel) => {
-//     characters = characters + ASCII_CHARS[Math.floor(pixel * interval)];
-//   });
-//   return characters;
-// };
-
-// ASCII_CHARS = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ".split("");
-
-// charLength = ASCII_CHARS.length;
-// interval = charLength / 256;
-// var newHeight = null;
-
-// const main = async (newWidth = 100) => {
-//   const newImgData = await pixelToAscii(
-//     resizeImg(convertToGrayscale(loadFileFromPath()))
-//   );
-//   const pixels = newImgData.length;
-//   let ASCII = "";
-//   for (i = 0; i < pixels; i += newWidth) {
-//     let line = newImgData.split("").slice(i, i + newWidth);
-//     ASCII = ASCII + "\n" + line;
-//   }
-
-//   setTimeout(() => {
-//     fs.writeFile("output.txt", ASCII, () => {
-//       console.log("done");
-//     });
-//   }, 5000);
-// };
-
-
-
 const ffmpeg = require('ffmpeg');
-// const Image = require('ascii-art-image');
-// function preview (){
-    // var image = new Image({
-    //     filepath: `./frames/my_frame_1920x810_317.jpg`,
-    //     alphabet:'variant1'
-    // });
+const getPixels = require("get-pixels")
+var image_pixels = require('image-pixels')
+var zeros = require("zeros")
+var savePixels = require("save-pixels")
+const Jimp = require('jimp');
 
-    // image.write(function(err, rendered){
-    //     console.log(rendered);
-
-    // })
-// }
 
 
 function createFrames(pathToVideo){
@@ -119,44 +39,12 @@ function createFrames(pathToVideo){
 
 }
 
-//Possibly work function
-function convertFrame(image){ 
-    
 
-
-
-}
 
 function createVideo(pathToImages){
 
-    // const { Converter } = require("ffmpeg-stream")
-    // const { createReadStream, createWriteStream } = require("fs")
-
-    // async function convert() {
-    //     const converter = new Converter()
-
-    //     // get a writable input stream and pipe an image file to it
-    //     const converterInput = converter.createInputStream({
-    //         f: "image2pipe",
-    //         vcodec: "mjpeg",
-    //     })
-    //     createReadStream(`${__dirname}/cat.jpg`).pipe(converterInput)
-
-    //     // create an output stream, crop/scale image, save to file via node stream
-
-    //     const converterOutput = converter.createOutputStream({
-    //         f: "image2",
-    //         vcodec: "mjpeg",
-    //         vf: "crop=300:300,scale=100:100",
-    //     })
-    //     converterOutput.pipe(createWriteStream(`${__dirname}/cat_thumb.jpg`))
-
-    //     // same, but save tconvert base64 image to pixel art
-    //     // start processing
-
-    //     await converter.run()
-    // }
 }
+
 
 
 async function cb(myBuffer){
@@ -171,9 +59,28 @@ async function cb(myBuffer){
 
 }
 
+
+//Possibly work function
+async function convertFrame(myBuffer){ 
+    
+    const x = await sharp(myBuffer)
+    .toFile("new-path.jpg")
+    .then(dataX => {
+        console.log(dataX);
+    })
+    .catch(error => 
+        console.log(error));
+
+
+}
+
+
+
 async function main(){    
 
-    let videoFrames = [];
+    /* INPUT SET */ 
+    // createFrames('path_to_video'); //Split the video into frames
+    // let videoFrames = [];  //Taking each frame in a loop. Add the frames to a list to make input set
     // fs.readdirSync("./frames").forEach(name => {
         // console.log(name)
         // console.log(fs.readFileSync(`./frames/${name}`));
@@ -181,48 +88,159 @@ async function main(){
     // })  
     // console.log(videoFrames);
 
-      
-
-    // let myBuffer;
-
-    // const result = await sharp(buffer).resize(52, 52).toBuffer().then(data => {
-    //     console.log('success')
-    //     console.log(data);
-        //<Buffer ff d8 ff db 00 43 00 06 04 05 06 05 04 06 06 05 06 07 07 06 08 0a 10 0a 0a 09 09 0a 14 0e 0f 0c 10 17 14 18 18 17 14 16 16 1a 1d 25 1f 1a 1b 23 1c 16 ... 1162 more bytes>
-            
-        //cb(data)
+     
+    let myBuffer = fs.readFileSync("./quality2/frame1.jpg");
+    // console.log(myBuffer);
+    // const workFn = await sharp(myBuffer).raw().toBuffer().then(data => {
+        // console.log('success')
+        // console.log(data);  
+        // cb(data)
         
     // }).catch(err => console.log(`downsize issue ${err}`))
 
-    // fs.writeFileSync("new-path.jpg", myBuffer);
+
+    // console.log("Pixel Data: " + myBuffer[0], myBuffer[1], myBuffer[2], myBuffer[3]);
+
+    let someConst;
+    getPixels(myBuffer, "image/jpeg", function(err, pixels){
+        if (err){
+            console.log(err);            
+            return;
+        } else {
+            someConst = pixels
+            // console.log(someConst);
+            // console.log("got pixels", pixels.data[0], pixels.data[1], pixels.data[2], pixels.data[3], )
+            // console.log(pixels);
+            
+        }
+    });
+    console.log("   Part 1: \n", someConst.data.length);
+    
+    
+    // ... modify ndarray ...
+
+    for(var i = 0; i<someConst.data.length; i=i+4){
+        var total = (someConst.data[i] + someConst.data[i+1] + someConst.data[i+2])/3
+        someConst.data[i] = total
+        someConst.data[i+1] = total
+        someConst.data[i+2] = total
+        console.log(i);
+    }
 
 
-    /* Setting up the Input Set */ 
-    // createFrames('path_to_video'); //to Split the video into frames
-    // convertFrame(); //Taking each frame in a loop. Add the frames to a list to make input set
+    const bufferOut = await savePixels(someConst, 'jpg'); // ndarray -> Uint8Array
+    // console.log("   Part 2: \n", bufferOut);
+    fs.writeFileSync('./output1.jpg', bufferOut._obj);
 
 
-
-    // console.log(contents.toString());
-
-    // Data and work function
-    // const data = [1, 53, 2, 12];
-
-
-    // function workFunction(datum) {
-      // Return the square of the number passed in
-      // progress();
-      // return datum * datum;
+    
+    // for(var i  = 0; i<myBuffer.length; i++){
+        
     // }
+    // console.log(myBuffer[0]);
+    // let x1 = parseInt(myBuffer[0], 16);
+    // let x2 = parseInt(myBuffer[1], 16);
+    // let x3 = parseInt(myBuffer[2], 16);
+    // let x4 = parseInt(myBuffer[3], 16);
+    // console.log(x1,x2,x3,x4);
+
+
+    // console.log(someConst.data);    
+    // Save to a file
+    // savePixels(someConst, "jpg").pipe(fs.createWriteStream("./test.jpg"))
+
+
+    // sharp(myBuffer)
+    // .toFile('some.jpg')
+    // .then(info => { 
+    //     console.log(info);
+    //  })
+    // .catch(err => { 
+    //     console.log(err);
+    // });
+
+
+    // var {data, width, height} = await image_pixels(myBuffer)
+    // console.log(data);
+
+
+    // console.log("Width of Image = " + width);
+    // console.log("Width of Height = " + height);
+    // console.log("Total pixel count: " + width*height);
+    // console.log("Data length (4 values for each pixel): " + data.length);
+
+    
+    // for(var i = 0; i < data.length; i++){
+    //     console.log("Original Val: " + data[i] + ", Hex: " + data[i].toString(16) );
+    // }
+     
+    // console.log("MyBuffer, data, " + typeof(myBuffer), typeof(data));
+      
+    
+    // let something = Jimp.rgbaToInt(171, 181, 194, 255).toString(16);
+    // let hexString = (171).toString(16);
+    // console.log(something);
+    // console.log(hexString);
+    // jimg.write("output.png")
+
     
 
-    /*DCP COMPUTE FOR */
-    // const compute = require('dcp/compute');
-    // const job = compute.for(inputSet, workFn); 
-    // job.public.name = 'Arnab example, nodejs';
-    // const results = await job.localExec(); //for executing the job locally OR
-    // const results = await job.exec(); //for executing the job on DCP
+
+
+    //Create an image
+    // var x = zeros([32, 32])
+    // x.set(16, 16, 255)
+    // savePixels(data, "JPG").pipe(fs.createWriteStream("./test.jpg"))     //Save to a file
+
+
+    // var count = 0;
+    // myBuffer.forEach((pixel) => {
+        // characters = characters + ASCII_CHARS[Math.floor(pixel * interval)];
+    //     console.log(pixel);
+    //     count++;
+    // });
+    // console.log("count: " + count);
+
+
+    // let imageData = [];      
+    // for(var y = 0; y<height; y++){
+    //     var x = 0;
+    //     let pixels = []
+    //     for(var i = width*y; i<(width*y*4)+(width*4); i+4){             
+    //         imageData[y][x] = imageData.push(Jimp.rgbaToInt(data[i], data[i+1], data[i+2], data[i+3]))
+    //         x = x + 1;
+    //     }
+    // }
+
     
+    
+
+   
+
+
+  
+    /* WORK FUNCTION */
+    // async function workFunction(someBuffer){
+        // const sharp = require("sharp")
+        // progress();
+        // const returnData = sharp(someBuffer)
+        // .grayscale() 
+        // .toBuffer()
+    
+        // return "workfunction"
+    // }
+
+    /* DCP COMPUTE FOR */
+    // const compute = require('dcp/compute');
+    // const job = compute.for(videoFrames, workFunction); 
+    // job.public.name = 'Arnab example, nodejs';
+    // job.requires(["./node_modules/sharp"]);
+
+    // let resultSet = await job.localExec(); //for executing the job locally OR
+    // const results = await job.exec(); //for executing the job on DCP
+
+    // resultSet = Array.from(resultSet);
+    // console.log(resultSet);
     
     /*Parsing and using the output set to get final result, i.e the video */
     // console.log(Array.from(results));
@@ -230,15 +248,14 @@ async function main(){
     // createVideo(); using the resulting output set. Might have to use child.process for the ffmpeg command 
     // ffmpeg -i my_frame_854x360_%d.jpg -vcodec mpeg4 test.avi
 
-
 }
 
-
-
-
-/* Initialize DCP Client and run main() */
+// /* Initialize DCP Client and run main() */
 require('dcp-client')
   .init(SCHEDULER_URL)
   .then(main)
   .catch(console.error)
   .finally(process.exit);
+
+
+
