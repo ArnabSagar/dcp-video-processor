@@ -4,6 +4,9 @@ quality1/
 quality2/
 quality3/
 output.txt
+*.png
+*.jpg
+*.mp4
 
 # Logs
 logs

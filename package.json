@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "ascii-art": "^2.8.5",
-    "dcp-client": "^4.1.16",
+    "dcp-client": "^4.1.18",
     "dcp-worker": "^3.1.13",
     "ffmpeg": "0.0.4",
     "ffmpeg-extract-frames": "^2.0.2",
