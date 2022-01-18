@@ -3,6 +3,8 @@ const fs = require("fs");
 const ffmpeg = require('ffmpeg');
 const getPixels = require("get-pixels")
 var savePixels = require("save-pixels")
+const { spawn } = require('child_process');
+
 
 
 
@@ -33,14 +35,31 @@ async function getPixelData(path){
 }
 
 
-function createVideo(pathToImages){
+function createVideo(pathToFrames){
 
+    const ls = spawn('ffmpeg', ['-i', `${pathToFrames}/output_%d.jpg`, '-vcodec', 'mpeg4', 'final.avi']);
+    
+    ls.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+    
+    ls.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+    
+    ls.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });
+    
 }
 
 
 function workFunction(pixelData){
 
-    // progress();
+    // debugger
+    // console.log(pixelData);
+    progress();
+    // pixelData = pixelData.data
     for(var i = 0; i<pixelData.length; i=i+4){
         var total = (pixelData[i] + pixelData[i+1] + pixelData[i+2])/3
         pixelData[i] = total
@@ -50,7 +69,6 @@ function workFunction(pixelData){
     }
 
     return pixelData
-
 }
 
 function createFrames(pathToVideo){
@@ -96,81 +114,84 @@ async function main(){
     let framesPixelsArray = []
 
     /* INPUT SET */  
-    await createFrames(pathToVideo)//Split the video into frames
-
-
+    // await createFrames(pathToVideo)//Split the video into frames
     let frames = fs.readdirSync(pathToFrames)    
     for(const frame of frames){             //Taking each frame in a loop. Converting the frame to pixel data.
-        console.log(frame);                                                           //BUG FOUND  - WHILE READING FILE NAMES
+        // console.log(frame);                                                           //BUG FOUND  - WHILE READING FILE NAMES
         let pixelData = await getPixelData(`${pathToFrames}/${frame}`)
         framesObjects.push(pixelData)    
     }
-
     framesObjects.forEach(element => {      //Add the pixel data of frames to a list from the object data of frames...to make input set 
-        framesPixelsArray.push(element.data)
+        framesPixelsArray.push(new Uint8Array(element.data))
     });
+    console.log(framesPixelsArray);
 
-    // console.log("here2");
+    // framesPixelsArray.forEach(obj => {
+    //     console.log("OLD PIXELS DATA: \n", new Uint8Array(obj));
+    // });
 
     /*DCP COMPUTE*/ 
-    // const compute = require('dcp/compute');
-    // const job = compute.for(videoFramesAsPixels, workFunction); 
+    const compute = require('dcp/compute');
+    const job = compute.for(framesPixelsArray, workFunction); 
 
-    // job.on('accepted', () => {
-    //     console.log(` - Job accepted by scheduler, waiting for results`);
-    //     console.log(` - Job has id ${job.id}`);
-    //     startTime = Date.now();
-    // });
+    job.on('accepted', () => {
+        console.log(` - Job accepted by scheduler, waiting for results`);
+        console.log(` - Job has id ${job.id}`);
+        startTime = Date.now();
+    });
 
-    // job.on('readystatechange', (arg) => {
-    //     console.log(`new ready state: ${arg}`);
-    // });
+    job.on('readystatechange', (arg) => {
+        console.log(`new ready state: ${arg}`);
+    });
 
-    // job.on('result', (ev) => {
-    //     console.log(
-    //         ` - Received result for slice ${ev.sliceNumber} at ${Math.round((Date.now() - startTime) / 100) / 10
-    //         }s`,
-    //     );
-    // });
+    job.on('result', (ev) => {
+        console.log(
+            ` - Received result for slice ${ev.sliceNumber} at ${Math.round((Date.now() - startTime) / 100) / 10
+            }s`,
+        );
+    });
   
-    // job.public.name = 'Arnab\'s intern project, nodejs ';
+    job.public.name = 'Arnab\'s intern project, nodejs ';
 
-    // let resultSet = await job.localExec(); //for executing the job locally OR
-    // const results = await job.exec(); //for executing the job on DCP
+    let resultSet = await job.localExec(); //for executing the job locally OR
+    // let resultSet = await job.exec(0.001); //for executing the job on DCP
+    
+    // // /* PROCESSING OF RESULTS */ 
+    resultSet = Array.from(resultSet);
+    console.log(resultSet);
+    let counter1 = 0
+    resultSet.forEach(function (frame) {
+        framesObjects[counter1].data = Array.from(frame)
+        counter1++;
+    });
+    console.log(framesObjects);
 
-    // resultSet = Array.from(resultSet);
-    // console.log(resultSet);
+    // console.log("New pixels data after the work function:");
+    // framesObjects.forEach(element => {
+    //     console.log(new Uint8Array(element.data) );
+    // });
 
-
-    /*Parsing and using the output set to get final result, i.e the video */
-    // console.log(Array.from(results));
-
-
-    for (let frame of framesPixelsArray) {
-        frame = workFunction(frame);
-    }
-
-
-
-    /* PROCESSING OF RESULTS */ 
-    for (var i = 0; i < framesObjects.length; i++) {    //Copying resulting pixel data of frames back to the list of object data of frames
-        framesObjects[i].data = framesPixelsArray[i];
-    }
-
-    // let counter = 0;    
-    // for(const frame of framesObjects){      //Loop to save each frame's object data as an image
-    //     counter++;
-    //     let bufferOut = await savePixels(frame, 'jpg'); // ndarray -> Uint8Array
-    //     fs.writeFileSync(`./outputSet/output_${counter}.jpg`, bufferOut._obj);
+    /* SOLUTION FOR NON-DCP RESULTS*/
+    // for (let frame of framesPixelsArray) {
+    //     frame = workFunction(frame);
+    // }
+    // for (var i = 0; i < framesObjects.length; i++) {    //Copying resulting pixel data of frames back to the list of object data of frames
+    //     framesObjects[i].data = framesPixelsArray[i];
     // }
 
-
     
-    /**
-     * Stiching resulting frames to a video
-     */
-    // createVideo(); using the resulting output set. Might have to use child.process for the ffmpeg command 
-    // ffmpeg -i my_frame_854x360_%d.jpg -vcodec mpeg4 test.avi
+    /* SAVING CONVERTED FRAMES' OBJECTS TO FRAMES' IMAGES */
+    let counter = 0;    
+    for(const frame of framesObjects){      //Loop to save each frame's object data as an image
+        counter++;
+        console.log(frame);
+        let bufferOut = await savePixels(frame, 'jpg'); // ndarray -> Uint8Array
+        fs.writeFileSync(`./outputSet/output_${counter}.jpg`, bufferOut._obj);
+    }
+
+
+    /* Stiching resulting frames to a video */
+    // createVideo(pathToConvertedFrames);
 
 }
 
