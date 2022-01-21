@@ -1,1 +1,1 @@
-Video Processing using DCP 
+Video Processing demonstrated using the Distributed Computed Protocol 
