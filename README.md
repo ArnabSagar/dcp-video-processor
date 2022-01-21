@@ -1,1 +1,1 @@
-Video Processing demonstrated using the Distributed Computed Protocol 
+Video Processing demonstrated using the Distributed Compute Protocol 
